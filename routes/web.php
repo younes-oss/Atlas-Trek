@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\VisitController; // ← Notre nouveau contrôleur
 
 Route::get('/', function () {
     return view('welcome');
@@ -37,6 +38,16 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/guide/dashboard', function () {
             return view('guide.dashboard');
         })->name('guide.dashboard');
+
+        // 📋 CRUD VISITES
+        // Route::resource() crée automatiquement toutes les routes CRUD :
+        //   GET  /visits          → index()   (liste)
+        //   GET  /visits/create   → create()  (formulaire création)
+        //   POST /visits          → store()   (enregistrement)
+        //   GET  /visits/{id}/edit → edit()   (formulaire modification)
+        //   PUT  /visits/{id}     → update()  (mise à jour)
+        //   DELETE /visits/{id}  → destroy() (suppression)
+        Route::resource('visits', VisitController::class)->except(['show']);
     });
 
     // --- ZONE VOYAGEUR ---

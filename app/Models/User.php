@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use \App\Models\Visit;
 
 class User extends Authenticatable
 {
@@ -56,5 +57,11 @@ class User extends Authenticatable
     public function isVoyageur(): bool
     {
         return $this->role === 'voyageur';
+    }
+
+    
+    public function visits()
+    {
+        return $this->hasMany(Visit::class);
     }
 }
