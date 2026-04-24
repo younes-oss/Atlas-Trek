@@ -8,6 +8,15 @@ use Illuminate\Http\Request;
 class VisitController extends Controller
 {
     /**
+     * WELCOME — Affiche la page d'accueil avec les dernières visites.
+     */
+    public function welcome()
+    {
+        $visits = Visit::orderBy('created_at', 'desc')->take(6)->get();
+        return view('welcome', compact('visits'));
+    }
+
+    /**
      * INDEX — Affiche la liste de toutes les visites du guide connecté.
      *
      * On récupère uniquement les visites créées par l'utilisateur connecté.
@@ -21,7 +30,7 @@ class VisitController extends Controller
             ->get();
 
         // Passe la variable $visits à la vue
-        return view('visits.index', compact('visits'));
+        return view('guide.dashboard', compact('visits'));
     }
 
     /**
@@ -49,7 +58,7 @@ class VisitController extends Controller
         'price'       => 'required|numeric|min:0',
         'duration'    => 'required|integer|min:1',
         'difficulty'  => 'required|in:facile,moyen,difficile',
-        'image'       => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        'image'       => 'required|image|mimes:jpeg,png,jpg|max:6000',
     ]);
 
     $path = null;
