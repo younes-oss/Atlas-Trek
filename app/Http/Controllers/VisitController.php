@@ -24,13 +24,41 @@ class VisitController extends Controller
      */
     public function index()
     {
-        // Récupère toutes les visites du guide connecté, triées par date de création (la plus récente en premier)
-        $visits = Visit::where('user_id', auth()->id())
+        $userId = auth()->id();
+
+        // Récupère toutes les visites du guide connecté
+        $visits = Visit::where('user_id', $userId)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Passe la variable $visits à la vue
-        return view('guide.dashboard', compact('visits'));
+        // Récupère les réservations liées aux visites du guide
+        $reservationsQuery = \App\Models\Reservation::whereHas('visit', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        });
+
+        $recentReservations = (clone $reservationsQuery)
+            ->with(['user', 'visit'])
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        // Statistiques dynamiques
+        $stats = [
+            'total_visits' => $visits->count(),
+            'total_reservations' => (clone $reservationsQuery)->count(),
+            'pending_reservations' => (clone $reservationsQuery)->where('status', 'en_attente')->count(),
+            'confirmed_reservations' => (clone $reservationsQuery)->where('status', 'confirmé')->count(),
+        ];
+
+        return view('guide.dashboard', compact('visits', 'recentReservations', 'stats'));
+    }
+
+    /**
+     * SHOW — Affiche les détails d'une visite.
+     */
+    public function show(Visit $visit)
+    {
+        return view('visits.show', compact('visit'));
     }
 
     /**

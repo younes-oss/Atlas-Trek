@@ -3,9 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\VisitController; // ← Notre nouveau contrôleur
+use App\Http\Controllers\VisitController;
+use App\Http\Controllers\ReservationController;
 
 Route::get('/', [VisitController::class, 'welcome'])->name('welcome');
+Route::get('/visits/{visit}', [VisitController::class, 'show'])->name('visits.show');
 
 
 Route::middleware('guest')->group(function () {
@@ -32,11 +34,15 @@ Route::middleware(['auth'])->group(function () {
     });
 
     
-    Route::middleware(['guide'])->group(function () {
-        Route::get('/guide/dashboard', [VisitController::class, 'index'])->name('guide.dashboard');
+    Route::middleware(['guide'])->prefix('guide')->group(function () {
+        Route::get('/dashboard', [VisitController::class, 'index'])->name('guide.dashboard');
+        Route::get('/reservations', [ReservationController::class, 'index'])->name('guide.reservations');
+        Route::patch('/reservations/{reservation}/status', [ReservationController::class, 'updateStatus'])->name('guide.reservations.update');
 
-        Route::resource('visits', VisitController::class)->except(['show']);
+        Route::resource('visits', VisitController::class)->except(['show', 'index']);
     });
+
+    Route::post('/visits/{visit}/reserve', [ReservationController::class, 'store'])->name('visits.reserve');
 
     Route::get('/home', function () {
         return view('home');
