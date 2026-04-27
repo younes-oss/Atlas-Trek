@@ -94,7 +94,9 @@
                             </div>
                         </div>
                         <div class="p-6 flex flex-col flex-grow">
-                            <h3 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">{{ $visit->title }}</h3>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">
+                                <a href="{{ route('visits.show', $visit) }}">{{ $visit->title }}</a>
+                            </h3>
                             <p class="text-gray-500 text-sm mb-4 flex items-center">
                                 <svg class="h-4 w-4 mr-1 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -108,7 +110,7 @@
                                     <span class="text-sm text-gray-500 block mb-0.5">Starting from</span>
                                     <span class="text-3xl font-extrabold text-emerald-600">{{ number_format($visit->price, 0) }} MAD</span>
                                 </div>
-                                <button class="bg-gray-900 text-white px-5 py-2.5 rounded-full font-medium hover:bg-emerald-600 transition-colors duration-300">View Details</button>
+                                <a href="{{ route('visits.show', $visit) }}" class="bg-gray-900 text-white px-5 py-2.5 rounded-full font-medium hover:bg-emerald-600 transition-colors duration-300">View Details</a>
                             </div>
                         </div>
                     </div>
