@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\IsAdmin::class,
             'guide' => \App\Http\Middleware\IsGuide::class,
             'guide.verified' => \App\Http\Middleware\IsGuideVerified::class,
+            'voyageur' => \App\Http\Middleware\IsVoyageur::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
