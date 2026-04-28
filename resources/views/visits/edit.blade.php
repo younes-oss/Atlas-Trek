@@ -193,7 +193,7 @@
         <!-- Boutons -->
         <div style="display: flex; gap: 10px;">
             <button type="submit" class="btn">💾 Mettre à jour</button>
-            <a href="{{ route('visits.index') }}" class="btn btn-secondary">Annuler</a>
+            <a href="{{ route('guide.dashboard') }}" class="btn btn-secondary">Annuler</a>
         </div>
 
     </form>
