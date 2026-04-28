@@ -147,15 +147,26 @@ class VisitController extends Controller
             'difficulty'  => 'required|in:facile,moyen,difficile',
         ]);
 
-        // Mise à jour de la visite (on ne change pas user_id)
-        $visit->update([
+        $path = null;
+
+    if ($request->hasFile('image')) {
+        $path = $request->file('image')->store('visits', 'public');
+    }
+
+        $data = [
             'title'       => $request->title,
             'description' => $request->description,
             'location'    => $request->location,
             'price'       => $request->price,
             'duration'    => $request->duration,
             'difficulty'  => $request->difficulty,
-        ]);
+        ];
+
+        if ($path) {
+            $data['image'] = $path;
+        }
+
+        $visit->update($data);
 
         return redirect()->route('guide.dashboard')->with('success', 'Visite mise à jour avec succès !');
     }
