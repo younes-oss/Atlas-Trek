@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\VoyageurController;
 
 Route::get('/', [VisitController::class, 'welcome'])->name('welcome');
 Route::get('/visits/{visit}', [VisitController::class, 'show'])->name('visits.show');
@@ -42,10 +43,21 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('visits', VisitController::class)->except(['show', 'index']);
     });
 
+    // --- ZONE VOYAGEUR ---
+    Route::middleware(['voyageur'])->prefix('voyageur')->group(function () {
+        Route::get('/dashboard', [VoyageurController::class, 'dashboard'])->name('voyageur.dashboard');
+        Route::get('/reservations', [VoyageurController::class, 'reservations'])->name('voyageur.reservations');
+        Route::get('/profile', [VoyageurController::class, 'profile'])->name('voyageur.profile');
+    });
+
     Route::post('/visits/{visit}/reserve', [ReservationController::class, 'store'])->name('visits.reserve');
 
     Route::get('/home', function () {
-        return view('home');
+        // Redirection basée sur le rôle pour la route /home par défaut de Laravel
+        $role = auth()->user()->role;
+        if ($role === 'guide') return redirect()->route('guide.dashboard');
+        if ($role === 'admin') return redirect()->route('admin.dashboard');
+        return redirect()->route('voyageur.dashboard');
     })->name('home');
 
 });

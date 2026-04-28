@@ -106,7 +106,7 @@ class VisitController extends Controller
         'user_id'     => auth()->id(),
     ]);
 
-    return redirect()->route('visits.index')
+    return redirect()->route('guide.dashboard')
                      ->with('success', 'Visite créée avec succès !');
 }
     /**
@@ -157,7 +157,7 @@ class VisitController extends Controller
             'difficulty'  => $request->difficulty,
         ]);
 
-        return redirect()->route('visits.index')->with('success', 'Visite mise à jour avec succès !');
+        return redirect()->route('guide.dashboard')->with('success', 'Visite mise à jour avec succès !');
     }
 
     /**
@@ -174,6 +174,6 @@ class VisitController extends Controller
 
         $visit->delete();
 
-        return redirect()->route('visits.index')->with('success', 'Visite supprimée avec succès !');
+        return redirect()->route('guide.dashboard')->with('success', 'Visite supprimée avec succès !');
     }
 }
