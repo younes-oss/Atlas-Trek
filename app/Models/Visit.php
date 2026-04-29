@@ -16,6 +16,7 @@ class Visit extends Model
         'difficulty',
         'image',
         'user_id',
+        'max_places',
     ];
 
     public function user()

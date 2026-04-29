@@ -185,6 +185,17 @@
             <div class="error">{{ $message }}</div>
             @enderror
         </div>
+
+        <!-- Max Places -->
+        <div class="form-group">
+            <label for="max_places">Nombre de places maximum *</label>
+            <input type="number" id="max_places" name="max_places"
+                value="{{ old('max_places', $visit->max_places) }}"
+                min="1">
+            @error('max_places')
+            <div class="error">{{ $message }}</div>
+            @enderror
+        </div>
         <div>
             <label>Image :</label>
             <input type="file" name="image">

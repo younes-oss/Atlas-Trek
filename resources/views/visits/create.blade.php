@@ -114,6 +114,17 @@
                             <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
                         @enderror
                     </div>
+
+                    <!-- Max Places -->
+                    <div>
+                        <label for="max_places" class="block text-sm font-bold text-gray-700 mb-2">Nombre de places maximum *</label>
+                        <input type="number" id="max_places" name="max_places" value="{{ old('max_places', 1) }}" min="1"
+                            class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none"
+                            placeholder="Ex: 10">
+                        @error('max_places')
+                            <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
 
                 <!-- Image -->

@@ -16,6 +16,12 @@ class ReservationController extends Controller
             'number_of_people' => 'required|integer|min:1',
         ]);
 
+        $totalReserved = $visit->reservations()->where('status', 'confirmé')->sum('number_of_people');
+        
+        if ($totalReserved + $request->number_of_people > $visit->max_places) {
+            return redirect()->back()->withErrors(['number_of_people' => 'Désolé, il n\'y a pas assez de places disponibles pour cette visite.']);
+        }
+
         Reservation::create([
             'user_id' => auth()->id(),
             'visit_id' => $visit->id,
@@ -41,7 +47,7 @@ class ReservationController extends Controller
 
     public function updateStatus(Request $request, Reservation $reservation)
     {
-        // Security check: ensure the reservation belongs to a visit owned by the authenticated guide
+
         if ($reservation->visit->user_id !== auth()->id()) {
             abort(403);
         }

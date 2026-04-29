@@ -118,7 +118,7 @@
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                         </div>
                         <p class="text-[10px] uppercase font-black text-gray-400 tracking-widest">Groupe</p>
-                        <p class="font-extrabold text-gray-900">Max 10</p>
+                        <p class="font-extrabold text-gray-900">Max {{ $visit->max_places }}</p>
                     </div>
                 </div>
 
@@ -150,8 +150,20 @@
 
             <!-- Booking Column -->
             <div class="lg:col-span-4">
+                @php
+                    $totalReserved = $visit->reservations()->where('status', 'confirmé')->sum('number_of_people');
+                    $remainingPlaces = $visit->max_places - $totalReserved;
+                    $isFull = $remainingPlaces <= 0;
+                @endphp
+
                 <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-gray-200 border border-gray-100 p-10 sticky top-28">
-                    <div class="mb-10 text-center">
+                    <div class="mb-6 text-center">
+                        @if($isFull)
+                            <span class="inline-block px-4 py-1.5 rounded-full bg-red-100 text-red-600 text-[10px] font-black uppercase tracking-widest mb-4">Complet</span>
+                        @else
+                            <span class="inline-block px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-4">Disponible : {{ $remainingPlaces }} places</span>
+                        @endif
+
                         <p class="text-gray-400 font-bold uppercase tracking-widest text-xs mb-2">Prix par personne</p>
                         <div class="flex items-center justify-center gap-2">
                             <span class="text-5xl font-black text-emerald-600 tracking-tighter">{{ number_format($visit->price, 0) }}</span>
@@ -165,8 +177,8 @@
                             <div>
                                 <label for="date" class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Date de l'aventure</label>
                                 <div class="relative">
-                                    <input type="date" id="date" name="date" required min="{{ date('Y-m-d') }}"
-                                        class="w-full pl-12 pr-6 py-4 rounded-2xl border-2 border-gray-50 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-0 outline-none transition-all font-bold text-gray-900">
+                                    <input type="date" id="date" name="date" required min="{{ date('Y-m-d') }}" {{ $isFull ? 'disabled' : '' }}
+                                        class="w-full pl-12 pr-6 py-4 rounded-2xl border-2 border-gray-50 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-0 outline-none transition-all font-bold text-gray-900 {{ $isFull ? 'opacity-50 cursor-not-allowed' : '' }}">
                                     <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                 </div>
                                 @error('date')
@@ -177,9 +189,9 @@
                             <div>
                                 <label for="number_of_people" class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Nombre d'explorateurs</label>
                                 <div class="relative">
-                                    <select id="number_of_people" name="number_of_people" required
-                                        class="w-full pl-12 pr-6 py-4 rounded-2xl border-2 border-gray-50 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-0 outline-none transition-all appearance-none font-bold text-gray-900">
-                                        @for($i = 1; $i <= 10; $i++)
+                                    <select id="number_of_people" name="number_of_people" required {{ $isFull ? 'disabled' : '' }}
+                                        class="w-full pl-12 pr-6 py-4 rounded-2xl border-2 border-gray-50 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-0 outline-none transition-all appearance-none font-bold text-gray-900 {{ $isFull ? 'opacity-50 cursor-not-allowed' : '' }}">
+                                        @for($i = 1; $i <= min($visit->max_places, $remainingPlaces); $i++)
                                             <option value="{{ $i }}">{{ $i }} {{ $i > 1 ? 'personnes' : 'personne' }}</option>
                                         @endfor
                                     </select>
@@ -192,9 +204,12 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="w-full bg-emerald-600 hover:bg-gray-900 text-white px-8 py-5 rounded-[2rem] font-black text-lg shadow-xl shadow-emerald-200 hover:shadow-gray-200 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
-                            Réserver maintenant
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                        <button type="submit" {{ $isFull ? 'disabled' : '' }}
+                            class="w-full bg-emerald-600 hover:bg-gray-900 text-white px-8 py-5 rounded-[2rem] font-black text-lg shadow-xl shadow-emerald-200 hover:shadow-gray-200 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3 {{ $isFull ? 'opacity-50 cursor-not-allowed bg-gray-400' : '' }}">
+                            {{ $isFull ? 'Complet' : 'Réserver maintenant' }}
+                            @if(!$isFull)
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                            @endif
                         </button>
                     </form>
 
