@@ -87,6 +87,7 @@ class VisitController extends Controller
         'duration'    => 'required|integer|min:1',
         'difficulty'  => 'required|in:facile,moyen,difficile',
         'image'       => 'required|image|mimes:jpeg,png,jpg|max:6000',
+        'max_places'  => 'required|integer|min:1',
     ]);
 
     $path = null;
@@ -104,6 +105,7 @@ class VisitController extends Controller
         'difficulty'  => $request->difficulty,
         'image'       => $path, 
         'user_id'     => auth()->id(),
+        'max_places'  => $request->max_places,
     ]);
 
     return redirect()->route('guide.dashboard')
@@ -145,6 +147,7 @@ class VisitController extends Controller
             'price'       => 'required|numeric|min:0',
             'duration'    => 'required|integer|min:1',
             'difficulty'  => 'required|in:facile,moyen,difficile',
+            'max_places'  => 'required|integer|min:1',
         ]);
 
         $path = null;
@@ -160,6 +163,7 @@ class VisitController extends Controller
             'price'       => $request->price,
             'duration'    => $request->duration,
             'difficulty'  => $request->difficulty,
+            'max_places'  => $request->max_places,
         ];
 
         if ($path) {
