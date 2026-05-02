@@ -72,6 +72,18 @@
                     </span>
                 </div>
                 <h1 class="text-5xl md:text-6xl font-black text-white tracking-tighter">{{ $visit->title }}</h1>
+                @if($visit->reviews()->count() > 0)
+                    <div class="mt-4 flex items-center gap-2">
+                        <div class="flex text-amber-400">
+                            @php $avg = round($visit->reviews()->avg('rating')); @endphp
+                            @for($i = 1; $i <= 5; $i++)
+                                <svg class="w-6 h-6 {{ $i <= $avg ? 'fill-current' : 'text-white/30' }}" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            @endfor
+                        </div>
+                        <span class="text-white font-bold">{{ number_format($visit->reviews()->avg('rating'), 1) }} / 5</span>
+                        <span class="text-white/60 text-sm">({{ $visit->reviews()->count() }} avis)</span>
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -80,12 +92,23 @@
             <!-- Details Column -->
             <div class="lg:col-span-8">
                 @if(session('success'))
-                    <div class="mb-10 bg-emerald-50 border-l-8 border-emerald-500 p-6 rounded-2xl shadow-sm animate-bounce">
+                    <div class="mb-10 bg-emerald-50 border-l-8 border-emerald-500 p-6 rounded-2xl shadow-sm">
                         <div class="flex items-center gap-3">
                             <svg class="w-6 h-6 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                             </svg>
                             <p class="text-lg font-bold text-emerald-900">{{ session('success') }}</p>
+                        </div>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="mb-10 bg-red-50 border-l-8 border-red-500 p-6 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                            <p class="text-lg font-bold text-red-900">{{ session('error') }}</p>
                         </div>
                     </div>
                 @endif
@@ -145,6 +168,81 @@
                         <h3 class="text-3xl font-black text-gray-900 tracking-tighter mb-2">{{ $visit->user->name }}</h3>
                         <p class="text-gray-500 font-medium max-w-md leading-relaxed">Expert local passionné par les montagnes de l'Atlas. Prêt à vous faire découvrir les secrets les mieux gardés de notre région.</p>
                     </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="mt-16">
+                    <div class="flex items-center justify-between mb-10">
+                        <h2 class="text-3xl font-black text-gray-900 tracking-tighter">⭐ Avis des voyageurs</h2>
+                        @if($visit->reviews()->count() > 0)
+                            <span class="bg-gray-100 px-4 py-2 rounded-2xl text-sm font-bold text-gray-600">
+                                {{ number_format($visit->reviews()->avg('rating'), 1) }} / 5 ({{ $visit->reviews()->count() }} avis)
+                            </span>
+                        @endif
+                    </div>
+
+                    <div class="space-y-6 mb-12">
+                        @forelse($visit->reviews as $review)
+                            <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center font-bold text-gray-400">
+                                            {{ substr($review->user->name, 0, 1) }}
+                                        </div>
+                                        <div>
+                                            <p class="font-black text-gray-900">{{ $review->user->name }}</p>
+                                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{{ $review->created_at->format('d M Y') }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex text-amber-400">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <svg class="w-4 h-4 {{ $i <= $review->rating ? 'fill-current' : 'text-gray-200' }}" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        @endfor
+                                    </div>
+                                </div>
+                                <p class="text-gray-600 leading-relaxed">{{ $review->comment }}</p>
+                            </div>
+                        @empty
+                            <div class="bg-gray-50 border-2 border-dashed border-gray-200 p-10 rounded-[2rem] text-center">
+                                <p class="text-gray-400 font-bold italic text-lg">Aucun avis pour le moment. Soyez le premier à partager votre expérience !</p>
+                            </div>
+                        @endforelse
+                    </div>
+
+                    @if($canReview)
+                        <div class="bg-emerald-900 rounded-[2.5rem] p-10 text-white shadow-2xl shadow-emerald-200">
+                            <h3 class="text-3xl font-black mb-2 tracking-tighter">Laissez un avis</h3>
+                            <p class="text-emerald-200/80 mb-8 font-medium">Partagez vos souvenirs avec la communauté !</p>
+
+                            <form action="{{ route('reviews.store', $visit) }}" method="POST" class="space-y-6">
+                                @csrf
+                                <div>
+                                    <label class="block text-[10px] font-black text-emerald-300 uppercase tracking-widest mb-3">Note de l'expérience</label>
+                                    <div class="flex gap-4">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <label class="cursor-pointer group">
+                                                <input type="radio" name="rating" value="{{ $i }}" class="hidden" required>
+                                                <div class="w-12 h-12 rounded-2xl bg-emerald-800 border-2 border-emerald-700 flex items-center justify-center group-hover:bg-emerald-700 transition-all peer-checked:bg-amber-400 peer-checked:border-amber-300">
+                                                    <span class="font-black text-lg group-hover:scale-110 transition-transform">{{ $i }}</span>
+                                                </div>
+                                            </label>
+                                        @endfor
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label for="comment" class="block text-[10px] font-black text-emerald-300 uppercase tracking-widest mb-2">Votre commentaire</label>
+                                    <textarea id="comment" name="comment" rows="4" required
+                                        class="w-full px-6 py-4 rounded-2xl bg-emerald-800 border-2 border-emerald-700 focus:border-amber-400 outline-none transition-all placeholder-emerald-600 text-white font-bold"
+                                        placeholder="Racontez-nous votre aventure..."></textarea>
+                                </div>
+
+                                <button type="submit" class="bg-amber-400 hover:bg-white text-emerald-950 px-10 py-4 rounded-full font-black uppercase tracking-widest text-sm transition-all shadow-xl shadow-emerald-950/20 active:scale-95">
+                                    Publier mon avis
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 </div>
             </div>
 

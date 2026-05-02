@@ -58,7 +58,15 @@ class VisitController extends Controller
      */
     public function show(Visit $visit)
     {
-        return view('visits.show', compact('visit'));
+        $canReview = false;
+        if (auth()->check()) {
+            $canReview = \App\Models\Reservation::where('user_id', auth()->id())
+                ->where('visit_id', $visit->id)
+                ->where('status', 'confirmé')
+                ->exists();
+        }
+
+        return view('visits.show', compact('visit', 'canReview'));
     }
 
     /**
