@@ -6,9 +6,11 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\VoyageurController;
+use App\Http\Controllers\ReviewController;
 
 Route::get('/', [VisitController::class, 'welcome'])->name('welcome');
 Route::get('/visits/{visit}', [VisitController::class, 'show'])->name('visits.show');
+Route::post('/visits/{visit}/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
 
 
 Route::middleware('guest')->group(function () {

@@ -28,4 +28,9 @@ class Visit extends Model
     {
         return $this->hasMany(Reservation::class);
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
 }
