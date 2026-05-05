@@ -13,7 +13,8 @@ class VisitController extends Controller
     public function welcome()
     {
         $visits = Visit::orderBy('created_at', 'desc')->take(6)->get();
-        return view('welcome', compact('visits'));
+        $reviews = \App\Models\Review::with(['user', 'visit'])->orderBy('created_at', 'desc')->take(3)->get();
+        return view('welcome', compact('visits', 'reviews'));
     }
 
     /**
