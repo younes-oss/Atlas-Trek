@@ -7,10 +7,16 @@ use App\Http\Controllers\VisitController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\VoyageurController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\FavoriteController;
 
 Route::get('/', [VisitController::class, 'welcome'])->name('welcome');
 Route::get('/visits/{visit}', [VisitController::class, 'show'])->name('visits.show');
-Route::post('/visits/{visit}/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
+
+Route::middleware('auth')->group(function () {
+    Route::post('/visits/{visit}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::post('/visits/{visit}/favorite', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+});
 
 
 Route::middleware('guest')->group(function () {
