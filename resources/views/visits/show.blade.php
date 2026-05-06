@@ -60,6 +60,26 @@
                     </div>
                 @endif
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                
+                <!-- Bouton Favori -->
+                @auth
+                    <form action="{{ route('favorites.toggle', $visit) }}" method="POST" class="absolute top-6 right-6 z-10">
+                        @csrf
+                        <button type="submit" class="w-14 h-14 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center hover:bg-white/40 transition-colors shadow-lg border border-white/20">
+                            @if($visit->isFavoritedBy(auth()->user()))
+                                <!-- Coeur plein -->
+                                <svg class="w-8 h-8 text-red-500 fill-current drop-shadow-md" viewBox="0 0 24 24">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            @else
+                                <!-- Coeur vide -->
+                                <svg class="w-8 h-8 text-white hover:text-red-400 transition-colors drop-shadow-md" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                            @endif
+                        </button>
+                    </form>
+                @endauth
             </div>
             
             <div class="absolute bottom-10 left-10 right-10">
