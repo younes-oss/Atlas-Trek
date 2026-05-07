@@ -8,6 +8,7 @@ use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\VoyageurController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\AdminController;
 
 Route::get('/', [VisitController::class, 'welcome'])->name('welcome');
 Route::get('/visits/{visit}', [VisitController::class, 'show'])->name('visits.show');
@@ -36,10 +37,17 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     
    
-    Route::middleware(['admin'])->group(function () {
-        Route::get('/admin/dashboard', function () {
-            return view('admin.dashboard');
-        })->name('admin.dashboard');
+    // --- ZONE ADMIN ---
+    Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/guides', [AdminController::class, 'guides'])->name('guides');
+        Route::patch('/guides/{user}/verify', [AdminController::class, 'verifyGuide'])->name('guides.verify');
+        Route::delete('/guides/{user}/reject', [AdminController::class, 'rejectGuide'])->name('guides.reject');
+        Route::get('/visits', [AdminController::class, 'visits'])->name('visits');
+        Route::delete('/visits/{visit}', [AdminController::class, 'deleteVisit'])->name('visits.delete');
+        Route::get('/reservations', [AdminController::class, 'reservations'])->name('reservations');
+        Route::get('/users', [AdminController::class, 'users'])->name('users');
+        Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
     });
 
     
