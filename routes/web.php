@@ -50,15 +50,17 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
     });
 
-    
-    Route::middleware(['guide'])->prefix('guide')->group(function () {
-        Route::get('/dashboard', [VisitController::class, 'index'])->name('guide.dashboard');
-        Route::get('/reservations', [ReservationController::class, 'index'])->name('guide.reservations');
-        Route::patch('/reservations/{reservation}/status', [ReservationController::class, 'updateStatus'])->name('guide.reservations.update');
-
-        Route::resource('visits', VisitController::class)->except(['show', 'index']);
+    // --- ZONE GUIDE (Dashboard & Reservations) ---
+    Route::middleware(['guide'])->prefix('guide')->name('guide.')->group(function () {
+        Route::get('/dashboard', [VisitController::class, 'index'])->name('dashboard');
+        Route::get('/reservations', [ReservationController::class, 'index'])->name('reservations');
+        Route::patch('/reservations/{reservation}/status', [ReservationController::class, 'updateStatus'])->name('reservations.update');
     });
 
+    // --- ZONE GUIDE (Verified Only: Visit Management) ---
+    Route::middleware(['guide', 'guide.verified'])->prefix('guide')->group(function () {
+        Route::resource('visits', VisitController::class)->except(['show', 'index']);
+    });
     // --- ZONE VOYAGEUR ---
     Route::middleware(['voyageur'])->prefix('voyageur')->group(function () {
         Route::get('/dashboard', [VoyageurController::class, 'dashboard'])->name('voyageur.dashboard');

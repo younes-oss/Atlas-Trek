@@ -8,12 +8,21 @@
         <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Dashboard</h1>
         <p class="text-gray-500 mt-2 text-lg">Gérez vos visites et suivez vos performances.</p>
     </div>
+    @if(Auth::user()->is_verified)
     <a href="{{ route('visits.create') }}" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 transform hover:-translate-y-0.5">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
         </svg>
         Nouvelle visite
     </a>
+    @else
+    <button disabled class="bg-gray-200 text-gray-500 px-5 py-2.5 rounded-xl font-bold cursor-not-allowed flex items-center gap-2" title="Votre compte doit être vérifié">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Nouvelle visite
+    </button>
+    @endif
 </div>
 
 <!-- Stats Section -->
