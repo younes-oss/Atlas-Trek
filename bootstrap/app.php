@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Console\Scheduling\Schedule;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'guide.verified' => \App\Http\Middleware\IsGuideVerified::class,
             'voyageur' => \App\Http\Middleware\IsVoyageur::class,
         ]);
+    })
+    ->withSchedule(function (Schedule $schedule): void {
+        // Expire automatiquement les réservations en attente
+        // dont la date limite est dépassée — toutes les 15 minutes
+        $schedule->command('reservations:expire')->everyFifteenMinutes();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
