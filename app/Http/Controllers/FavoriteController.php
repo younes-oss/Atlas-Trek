@@ -24,7 +24,7 @@ class FavoriteController extends Controller
                 'user_id' => $userId,
                 'visit_id' => $visit->id,
             ]);
-            $message = 'Visite ajoutée à vos favoris avec succès !';
+            $message = 'Visite ajoutée à vos favoris avec succès ';
         }
 
         return back()->with('success', $message);

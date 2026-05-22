@@ -37,7 +37,7 @@
                             <div class="text-xs text-gray-400 mt-0.5">{{ $reservation->visit->location }}</div>
                         </td>
                         <td class="px-8 py-6 text-gray-600 font-medium">
-                            {{ \Carbon\Carbon::parse($reservation->date)->format('d M Y') }}
+                            {{ $reservation->visit->date_depart ? $reservation->visit->date_depart->format('d M Y H:i') : '—' }}
                         </td>
                         <td class="px-8 py-6 text-gray-600 font-bold">
                             {{ $reservation->number_of_people }}
@@ -47,6 +47,8 @@
                                 <span class="px-3 py-1 text-[10px] font-bold rounded-full bg-amber-100 text-amber-800 uppercase tracking-wider">En attente</span>
                             @elseif($reservation->status === 'confirmé')
                                 <span class="px-3 py-1 text-[10px] font-bold rounded-full bg-emerald-100 text-emerald-800 uppercase tracking-wider">Confirmé</span>
+                            @elseif($reservation->status === 'expiré')
+                                <span class="px-3 py-1 text-[10px] font-bold rounded-full bg-gray-100 text-gray-600 uppercase tracking-wider">Expiré</span>
                             @else
                                 <span class="px-3 py-1 text-[10px] font-bold rounded-full bg-red-100 text-red-800 uppercase tracking-wider">Annulé</span>
                             @endif

@@ -150,6 +150,46 @@
                     @enderror
                 </div>
 
+                <!-- ═══ Dates de la visite ═══ -->
+                <div class="border-t border-gray-100 pt-6 mt-2">
+                    <h3 class="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
+                        <svg class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        Planification
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Date de départ -->
+                        <div>
+                            <label for="date_depart" class="block text-sm font-bold text-gray-700 mb-2">Date de départ *</label>
+                            <input type="datetime-local" id="date_depart" name="date_depart" value="{{ old('date_depart') }}"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none">
+                            @error('date_depart')
+                                <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Date de fin (optionnel) -->
+                        <div>
+                            <label for="date_fin" class="block text-sm font-bold text-gray-700 mb-2">Date de fin <span class="text-gray-400 font-normal">(optionnel)</span></label>
+                            <input type="datetime-local" id="date_fin" name="date_fin" value="{{ old('date_fin') }}"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none">
+                            @error('date_fin')
+                                <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Date limite de réservation -->
+                        <div class="md:col-span-2">
+                            <label for="date_limite_reservation" class="block text-sm font-bold text-gray-700 mb-2">Date limite de réservation *</label>
+                            <input type="datetime-local" id="date_limite_reservation" name="date_limite_reservation" value="{{ old('date_limite_reservation') }}"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none">
+                            <p class="text-xs text-gray-400 mt-1">Les réservations seront automatiquement fermées après cette date.</p>
+                            @error('date_limite_reservation')
+                                <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Actions -->
                 <div class="flex gap-4 pt-4">
                     <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">

@@ -3,37 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Models\Visit;
+use App\Models\Reservation;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreVisitRequest;
+use App\Http\Requests\UpdateVisitRequest;
+use Illuminate\Support\Facades\DB;
 
 class VisitController extends Controller
 {
     /**
-     * WELCOME — Affiche la page d'accueil avec les dernières visites.
+     * WELCOME — Affiche la page d'accueil avec les dernières visites à venir.
      */
     public function welcome()
     {
-        $visits = Visit::orderBy('created_at', 'desc')->take(6)->get();
-        $reviews = \App\Models\Review::with(['user', 'visit'])->orderBy('created_at', 'desc')->take(3)->get();
+        // On n'affiche que les visites dont la date de départ est dans le futur
+        $visits  = Visit::upcoming()->orderBy('date_depart', 'asc')->take(6)->get();
+        $reviews = \App\Models\Review::with(['user', 'visit'])
+            ->orderBy('created_at', 'desc')
+            ->take(3)
+            ->get();
+
         return view('welcome', compact('visits', 'reviews'));
     }
 
     /**
-     * INDEX — Affiche la liste de toutes les visites du guide connecté.
-     *
-     * On récupère uniquement les visites créées par l'utilisateur connecté.
-     * auth()->id() retourne l'ID de l'utilisateur actuellement connecté.
+     * INDEX — Dashboard du guide : liste ses propres visites.
      */
     public function index()
     {
         $userId = auth()->id();
 
-        // Récupère toutes les visites du guide connecté
         $visits = Visit::where('user_id', $userId)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('date_depart', 'asc')
             ->get();
 
-        // Récupère les réservations liées aux visites du guide
-        $reservationsQuery = \App\Models\Reservation::whereHas('visit', function ($query) use ($userId) {
+        $reservationsQuery = Reservation::whereHas('visit', function ($query) use ($userId) {
             $query->where('user_id', $userId);
         });
 
@@ -43,12 +47,11 @@ class VisitController extends Controller
             ->take(5)
             ->get();
 
-        // Statistiques dynamiques
         $stats = [
-            'total_visits' => $visits->count(),
-            'total_reservations' => (clone $reservationsQuery)->count(),
-            'pending_reservations' => (clone $reservationsQuery)->where('status', 'en_attente')->count(),
-            'confirmed_reservations' => (clone $reservationsQuery)->where('status', 'confirmé')->count(),
+            'total_visits'           => $visits->count(),
+            'total_reservations'     => (clone $reservationsQuery)->count(),
+            'pending_reservations'   => (clone $reservationsQuery)->where('status', Reservation::STATUS_PENDING)->count(),
+            'confirmed_reservations' => (clone $reservationsQuery)->where('status', Reservation::STATUS_CONFIRMED)->count(),
         ];
 
         return view('guide.dashboard', compact('visits', 'recentReservations', 'stats'));
@@ -61,9 +64,9 @@ class VisitController extends Controller
     {
         $canReview = false;
         if (auth()->check()) {
-            $canReview = \App\Models\Reservation::where('user_id', auth()->id())
+            $canReview = Reservation::where('user_id', auth()->id())
                 ->where('visit_id', $visit->id)
-                ->where('status', 'confirmé')
+                ->where('status', Reservation::STATUS_CONFIRMED)
                 ->exists();
         }
 
@@ -71,9 +74,7 @@ class VisitController extends Controller
     }
 
     /**
-     * CREATE — Affiche le formulaire pour créer une nouvelle visite.
-     *
-     * Cette méthode n'a pas de logique : elle affiche juste le formulaire.
+     * CREATE — Affiche le formulaire de création d'une visite.
      */
     public function create()
     {
@@ -81,54 +82,41 @@ class VisitController extends Controller
     }
 
     /**
-     * STORE — Enregistre la nouvelle visite en base de données.
-     *
-     * Laravel reçoit les données du formulaire via $request.
-     * On valide d'abord, puis on enregistre.
+     * STORE — Enregistre une nouvelle visite avec validation des dates.
+     * La validation du chevauchement est gérée dans StoreVisitRequest::withValidator().
      */
-   public function store(Request $request)
-{
-    $request->validate([
-        'title'       => 'required|string|max:255',
-        'description' => 'required|string',
-        'location'    => 'required|string|max:255',
-        'price'       => 'required|numeric|min:0',
-        'duration'    => 'required|integer|min:1',
-        'difficulty'  => 'required|in:facile,moyen,difficile',
-        'image'       => 'required|image|mimes:jpeg,png,jpg|max:6000',
-        'max_places'  => 'required|integer|min:1',
-    ]);
+    public function store(StoreVisitRequest $request)
+    {
+        $path = null;
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('visits', 'public');
+        }
 
-    $path = null;
+        Visit::create([
+            'title'                   => $request->title,
+            'description'             => $request->description,
+            'location'                => $request->location,
+            'price'                   => $request->price,
+            'duration'                => $request->duration,
+            'difficulty'              => $request->difficulty,
+            'image'                   => $path,
+            'user_id'                 => auth()->id(),
+            'max_places'              => $request->max_places,
+            'date_depart'             => $request->date_depart,
+            'date_fin'                => $request->date_fin,
+            'date_limite_reservation' => $request->date_limite_reservation,
+        ]);
 
-    if ($request->hasFile('image')) {
-        $path = $request->file('image')->store('visits', 'public');
+        return redirect()
+            ->route('guide.dashboard')
+            ->with('success', 'Visite créée avec succès !');
     }
 
-    Visit::create([
-        'title'       => $request->title,
-        'description' => $request->description,
-        'location'    => $request->location,
-        'price'       => $request->price,
-        'duration'    => $request->duration,
-        'difficulty'  => $request->difficulty,
-        'image'       => $path, 
-        'user_id'     => auth()->id(),
-        'max_places'  => $request->max_places,
-    ]);
-
-    return redirect()->route('guide.dashboard')
-                     ->with('success', 'Visite créée avec succès !');
-}
     /**
-     * EDIT — Affiche le formulaire pour modifier une visite existante.
-     *
-     * Laravel trouve automatiquement la visite grâce à l'ID dans l'URL.
-     * On vérifie que la visite appartient bien au guide connecté (sécurité).
+     * EDIT — Affiche le formulaire d'édition d'une visite existante.
      */
     public function edit(Visit $visit)
     {
-        // Sécurité : s'assurer que seul le créateur peut modifier sa visite
         if ($visit->user_id !== auth()->id()) {
             abort(403, 'Vous ne pouvez pas modifier une visite qui ne vous appartient pas.');
         }
@@ -137,67 +125,52 @@ class VisitController extends Controller
     }
 
     /**
-     * UPDATE — Met à jour la visite en base de données.
-     *
-     * Similaire à store(), mais on utilise $visit->update() au lieu de Visit::create().
+     * UPDATE — Met à jour une visite avec validation des dates et des chevauchements.
+     * StoreVisitRequest exclut automatiquement la visite courante du check de chevauchement.
      */
-    public function update(Request $request, Visit $visit)
+    public function update(UpdateVisitRequest $request, Visit $visit)
     {
-        // Sécurité : seul le créateur peut modifier
         if ($visit->user_id !== auth()->id()) {
             abort(403, 'Vous ne pouvez pas modifier une visite qui ne vous appartient pas.');
         }
 
-        // Validation — mêmes règles que store()
-        $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'required|string',
-            'location'    => 'required|string|max:255',
-            'price'       => 'required|numeric|min:0',
-            'duration'    => 'required|integer|min:1',
-            'difficulty'  => 'required|in:facile,moyen,difficile',
-            'max_places'  => 'required|integer|min:1',
-        ]);
-
-        $path = null;
-
-    if ($request->hasFile('image')) {
-        $path = $request->file('image')->store('visits', 'public');
-    }
-
         $data = [
-            'title'       => $request->title,
-            'description' => $request->description,
-            'location'    => $request->location,
-            'price'       => $request->price,
-            'duration'    => $request->duration,
-            'difficulty'  => $request->difficulty,
-            'max_places'  => $request->max_places,
+            'title'                   => $request->title,
+            'description'             => $request->description,
+            'location'                => $request->location,
+            'price'                   => $request->price,
+            'duration'                => $request->duration,
+            'difficulty'              => $request->difficulty,
+            'max_places'              => $request->max_places,
+            'date_depart'             => $request->date_depart,
+            'date_fin'                => $request->date_fin,
+            'date_limite_reservation' => $request->date_limite_reservation,
         ];
 
-        if ($path) {
-            $data['image'] = $path;
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('visits', 'public');
         }
 
         $visit->update($data);
 
-        return redirect()->route('guide.dashboard')->with('success', 'Visite mise à jour avec succès !');
+        return redirect()
+            ->route('guide.dashboard')
+            ->with('success', 'Visite mise à jour avec succès !');
     }
 
     /**
      * DESTROY — Supprime une visite.
-     *
-     * Le formulaire dans la vue envoie une requête DELETE vers cette méthode.
      */
     public function destroy(Visit $visit)
     {
-        // Sécurité : seul le créateur peut supprimer
         if ($visit->user_id !== auth()->id()) {
             abort(403, 'Vous ne pouvez pas supprimer une visite qui ne vous appartient pas.');
         }
 
         $visit->delete();
 
-        return redirect()->route('guide.dashboard')->with('success', 'Visite supprimée avec succès !');
+        return redirect()
+            ->route('guide.dashboard')
+            ->with('success', 'Visite supprimée avec succès !');
     }
 }

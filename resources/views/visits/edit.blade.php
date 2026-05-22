@@ -201,6 +201,39 @@
             <input type="file" name="image">
         </div>
 
+        <!-- ═══ Dates de la visite ═══ -->
+        <div class="form-group" style="border-top: 1px solid #eee; padding-top: 18px; margin-top: 10px;">
+            <label style="color: #e67e22; font-size: 14px;">📅 Planification</label>
+        </div>
+
+        <div class="form-group">
+            <label for="date_depart">Date de départ *</label>
+            <input type="datetime-local" id="date_depart" name="date_depart"
+                value="{{ old('date_depart', $visit->date_depart ? $visit->date_depart->format('Y-m-d\TH:i') : '') }}">
+            @error('date_depart')
+            <div class="error">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label for="date_fin">Date de fin <small>(optionnel)</small></label>
+            <input type="datetime-local" id="date_fin" name="date_fin"
+                value="{{ old('date_fin', $visit->date_fin ? $visit->date_fin->format('Y-m-d\TH:i') : '') }}">
+            @error('date_fin')
+            <div class="error">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label for="date_limite_reservation">Date limite de réservation *</label>
+            <input type="datetime-local" id="date_limite_reservation" name="date_limite_reservation"
+                value="{{ old('date_limite_reservation', $visit->date_limite_reservation ? $visit->date_limite_reservation->format('Y-m-d\TH:i') : '') }}">
+            <small>Les réservations seront fermées après cette date.</small>
+            @error('date_limite_reservation')
+            <div class="error">{{ $message }}</div>
+            @enderror
+        </div>
+
         <!-- Boutons -->
         <div style="display: flex; gap: 10px;">
             <button type="submit" class="btn">💾 Mettre à jour</button>

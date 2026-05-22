@@ -269,8 +269,7 @@
             <!-- Booking Column -->
             <div class="lg:col-span-4">
                 @php
-                    $totalReserved = $visit->reservations()->where('status', 'confirmé')->sum('number_of_people');
-                    $remainingPlaces = $visit->max_places - $totalReserved;
+                    $remainingPlaces = $visit->availablePlaces();
                     $isFull = $remainingPlaces <= 0;
                 @endphp
 
@@ -289,19 +288,26 @@
                         </div>
                     </div>
 
+                    @error('reservation')
+                        <div class="mb-6 bg-red-50 border-2 border-red-100 rounded-2xl p-4 flex items-start gap-3">
+                            <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                            </svg>
+                            <p class="text-sm font-bold text-red-800">{{ $message }}</p>
+                        </div>
+                    @enderror
+
                     <form action="{{ route('visits.reserve', $visit) }}" method="POST" class="space-y-8">
                         @csrf
                         <div class="space-y-4">
                             <div>
-                                <label for="date" class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Date de l'aventure</label>
+                                <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 px-1">Date de l'aventure</label>
                                 <div class="relative">
-                                    <input type="date" id="date" name="date" required min="{{ date('Y-m-d') }}" {{ $isFull ? 'disabled' : '' }}
-                                        class="w-full pl-12 pr-6 py-4 rounded-2xl border-2 border-gray-50 bg-gray-50 focus:bg-white focus:border-emerald-500 focus:ring-0 outline-none transition-all font-bold text-gray-900 {{ $isFull ? 'opacity-50 cursor-not-allowed' : '' }}">
-                                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    <div class="w-full pl-12 pr-6 py-4 rounded-2xl border-2 border-gray-50 bg-gray-50 font-bold text-gray-900 flex items-center">
+                                        {{ $visit->date_depart ? $visit->date_depart->format('d M Y à H:i') : 'Date non définie' }}
+                                    </div>
+                                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                 </div>
-                                @error('date')
-                                    <p class="text-red-500 text-xs mt-2 font-bold">{{ $message }}</p>
-                                @enderror
                             </div>
 
                             <div>

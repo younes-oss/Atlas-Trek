@@ -2,110 +2,173 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
 use App\Models\Reservation;
 use App\Models\Visit;
+use App\Http\Requests\StoreReservationRequest;
 
 class ReservationController extends Controller
 {
-    public function store(Request $request, Visit $visit)
-    {
-        $request->validate([
-            'date' => 'required|date|after_or_equal:today',
-            'number_of_people' => 'required|integer|min:1',
-        ]);
+    // ═══════════════════════════════════════════════════════════════════
+    //  STORE — Création d'une réservation par un voyageur
+    // ═══════════════════════════════════════════════════════════════════
 
-        $totalReserved = $visit->reservations()->where('status', 'confirmé')->sum('number_of_people');
-        
-        if ($totalReserved + $request->number_of_people > $visit->max_places) {
-            return redirect()->back()->withErrors(['number_of_people' => 'Désolé, il n\'y a pas assez de places disponibles pour cette visite.']);
+    /**
+     * Règles métier vérifiées avant de créer la réservation :
+     *   1. La visite ne doit pas avoir déjà démarré (date_depart > now)
+     *   2. La date limite de réservation ne doit pas être dépassée
+     *   3. Les places restantes doivent suffire
+     *
+     * On utilise lockForUpdate() pour sécuriser contre la concurrence.
+     */
+    public function store(StoreReservationRequest $request, Visit $visit)
+    {
+        // ── Règle 1 : Visite déjà passée ?
+        if ($visit->hasStarted()) {
+            return redirect()->back()->withErrors([
+                'reservation' => 'Impossible de réserver : cette visite a déjà démarré.',
+            ]);
         }
 
-        Reservation::create([
-            'user_id' => auth()->id(),
-            'visit_id' => $visit->id,
-            'date' => $request->date,
-            'number_of_people' => $request->number_of_people,
-            'status' => 'en_attente',
-        ]);
+        // ── Règle 2 : Date limite de réservation dépassée ?
+        if (!$visit->isOpenForReservation()) {
+            return redirect()->back()->withErrors([
+                'reservation' => 'La date limite de réservation est dépassée. Les réservations sont fermées.',
+            ]);
+        }
 
-        return redirect()->route('visits.show', $visit)->with('success', 'Votre réservation a été envoyée avec succès.');
+        // ── Règle 3 : Vérification des places (avec protection contre la concurrence)
+        try {
+            DB::transaction(function () use ($request, $visit) {
+
+                // On verrouille la visite en écriture pour ce calcul
+                $visitLock = Visit::lockForUpdate()->findOrFail($visit->id);
+
+                $remainingPlaces = $visitLock->availablePlaces();
+
+                if ($request->number_of_people > $remainingPlaces) {
+                    throw new \Exception(
+                        "Désolé, il reste seulement {$remainingPlaces} place(s) disponible(s) pour cette visite."
+                    );
+                }
+
+                Reservation::create([
+                    'user_id'          => auth()->id(),
+                    'visit_id'         => $visitLock->id,
+                    'date'             => $visitLock->date_depart,
+                    'number_of_people' => $request->number_of_people,
+                    'status'           => Reservation::STATUS_PENDING,
+                ]);
+            });
+
+            return redirect()
+                ->route('visits.show', $visit)
+                ->with('success', 'Votre réservation a été envoyée avec succès. En attente de confirmation.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['reservation' => $e->getMessage()]);
+        }
     }
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  INDEX — Liste des réservations du guide connecté
+    // ═══════════════════════════════════════════════════════════════════
 
     public function index()
     {
         $reservations = Reservation::whereHas('visit', function ($query) {
-            $query->where('user_id', auth()->id());
-        })
-        ->orderBy('created_at', 'desc')
-        ->with(['user', 'visit'])
-        ->get();
+                $query->where('user_id', auth()->id());
+            })
+            ->with(['user', 'visit'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('guide.reservations', compact('reservations'));
     }
 
+    // ═══════════════════════════════════════════════════════════════════
+    //  UPDATE STATUS — Confirmation ou annulation par le guide
+    // ═══════════════════════════════════════════════════════════════════
+
+    /**
+     * Règles métier pour la CONFIRMATION :
+     *   1. Seul le guide propriétaire de la visite peut confirmer
+     *   2. La visite ne doit pas avoir déjà démarré (date_depart > now)
+     *   3. La réservation doit être en statut "en_attente" (pas déjà traitée)
+     *   4. Le nombre de places doit suffire
+     *
+     * Transaction + lockForUpdate pour éviter les doublons concurrent.
+     */
     public function updateStatus(Request $request, Reservation $reservation)
     {
+        // ── Autorisation : seul le guide créateur de la visite peut agir
         if ($reservation->visit->user_id !== auth()->id()) {
-            abort(403);
+            abort(403, 'Action non autorisée.');
         }
 
         $request->validate([
-            'status' => 'required|in:confirmé,annulé'
+            'status' => 'required|in:confirmé,annulé',
         ]);
 
         $newStatus = $request->status;
 
-        if ($newStatus === 'confirmé') {
+        // ══ Branche CONFIRMATION ══
+        if ($newStatus === Reservation::STATUS_CONFIRMED) {
             try {
                 DB::transaction(function () use ($reservation) {
-                    // Lock the visit row to prevent concurrent confirmation checks from other transactions
-                    $visit = Visit::lockForUpdate()->findOrFail($reservation->visit_id);
 
-                    // Also lock the reservation row to ensure a fresh, consistent status
+                    // ── Verrouillage pessimiste : visit + reservation
+                    $visit           = Visit::lockForUpdate()->findOrFail($reservation->visit_id);
                     $reservationLock = Reservation::lockForUpdate()->findOrFail($reservation->id);
 
-                    // Safety check: is it already confirmed?
-                    if ($reservationLock->status === 'confirmé') {
-                        throw new \Exception("Cette réservation est déjà confirmée.");
-                    }
-
-                    // Count total people for already confirmed reservations on this visit
-                    $confirmedPlaces = $visit->reservations()
-                        ->where('status', 'confirmé')
-                        ->sum('number_of_people');
-
-                    // Calculate remaining capacity
-                    $remainingPlaces = $visit->max_places - $confirmedPlaces;
-
-                    // If the current reservation exceeds the remaining capacity, abort
-                    if ($reservationLock->number_of_people > $remainingPlaces) {
+                    // ── Règle 1 : La visite a-t-elle déjà démarré ?
+                    if ($visit->hasStarted()) {
                         throw new \Exception(
-                            "Places insuffisantes pour confirmer cette réservation. " .
-                            "Places restantes : {$remainingPlaces}, demandées : {$reservationLock->number_of_people}."
+                            'Impossible de confirmer : la date de départ de cette visite est déjà passée ('
+                            . $visit->date_depart->format('d/m/Y H:i') . ').'
                         );
                     }
 
-                    // Update the reservation status to confirmed
-                    $reservationLock->update([
-                        'status' => 'confirmé'
-                    ]);
+                    // ── Règle 2 : Statut encore en attente ?
+                    if ($reservationLock->status !== Reservation::STATUS_PENDING) {
+                        throw new \Exception(
+                            'Cette réservation a déjà été traitée (statut : ' . $reservationLock->status . ').'
+                        );
+                    }
+
+                    // ── Règle 3 : Places suffisantes ?
+                    // On recalcule les places occupées par TOUTES les autres réservations
+                    $otherOccupiedPlaces = $visit->reservations()
+                        ->whereIn('status', ['confirmé', 'en_attente'])
+                        ->where('id', '!=', $reservationLock->id)
+                        ->sum('number_of_people');
+
+                    $remainingPlaces = $visit->max_places - $otherOccupiedPlaces;
+
+                    if ($reservationLock->number_of_people > $remainingPlaces) {
+                        throw new \Exception(
+                            "Places insuffisantes. Places restantes : {$remainingPlaces}, "
+                            . "demandées : {$reservationLock->number_of_people}."
+                        );
+                    }
+
+                    // ── Tout est OK → on confirme
+                    $reservationLock->update(['status' => Reservation::STATUS_CONFIRMED]);
                 });
 
-                return redirect()->back()->with('success', 'La réservation a été confirmée avec succès.');
+                return redirect()->back()->with('success', 'Réservation confirmée avec succès.');
 
             } catch (\Exception $e) {
                 return redirect()->back()->withErrors(['error' => $e->getMessage()]);
             }
-        } else {
-            // Standard cancel update without pessimistic lock requirement on Visit
-            $reservation->update([
-                'status' => 'annulé'
-            ]);
-
-            return redirect()->back()->with('success', 'La réservation a été annulée avec succès.');
         }
+
+        // ══ Branche ANNULATION ══
+        // L'annulation ne nécessite pas de vérification de places ni de dates.
+        $reservation->update(['status' => Reservation::STATUS_CANCELLED]);
+
+        return redirect()->back()->with('success', 'Réservation annulée avec succès.');
     }
 }
