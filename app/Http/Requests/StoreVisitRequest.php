@@ -25,7 +25,7 @@ class StoreVisitRequest extends FormRequest
             'price'                   => 'required|numeric|min:0',
             'duration'                => 'required|integer|min:1',
             'difficulty'              => 'required|in:facile,moyen,difficile',
-            'image'                   => 'required|image|mimes:jpeg,png,jpg|max:6000',
+            'image'                   => 'required|image|mimes:jpeg,png,jpg|max:20480',
             'max_places'              => 'required|integer|min:1',
 
             // Dates — toutes en format datetime, dans le futur

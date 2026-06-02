@@ -39,7 +39,18 @@ class ReservationController extends Controller
             ]);
         }
 
-        // ── Règle 3 : Vérification des places (avec protection contre la concurrence)
+        // ── Règle 3 : Une seule réservation par jour par voyageur
+        $alreadyReservedToday = Reservation::where('user_id', auth()->id())
+            ->whereDate('created_at', today())
+            ->exists();
+
+        if ($alreadyReservedToday) {
+            return redirect()->back()->withErrors([
+                'reservation' => 'Vous avez déjà effectué une réservation aujourd\'hui. Vous pouvez en faire une nouvelle à partir de demain.',
+            ]);
+        }
+
+        // ── Règle 4 : Vérification des places (avec protection contre la concurrence)
         try {
             DB::transaction(function () use ($request, $visit) {
 
