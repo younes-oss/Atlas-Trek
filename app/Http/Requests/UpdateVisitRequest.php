@@ -22,7 +22,7 @@ class UpdateVisitRequest extends FormRequest
             'price'                   => 'required|numeric|min:0',
             'duration'                => 'required|integer|min:1',
             'difficulty'              => 'required|in:facile,moyen,difficile',
-            'image'                   => 'nullable|image|mimes:jpeg,png,jpg|max:6000',
+            'image'                   => 'nullable|image|mimes:jpeg,png,jpg|max:20480',
             'max_places'              => 'required|integer|min:1',
             'date_depart'             => 'required|date|after:now',
             'date_fin'                => 'nullable|date|after:date_depart',

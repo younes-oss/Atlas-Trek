@@ -4,6 +4,10 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Console\Scheduling\Schedule;
+use App\Http\Middleware\IsAdmin;
+use App\Http\Middleware\IsGuide;
+use App\Http\Middleware\IsGuideVerified;
+use App\Http\Middleware\IsVoyageur;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -13,10 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'admin' => \App\Http\Middleware\IsAdmin::class,
-            'guide' => \App\Http\Middleware\IsGuide::class,
-            'guide.verified' => \App\Http\Middleware\IsGuideVerified::class,
-            'voyageur' => \App\Http\Middleware\IsVoyageur::class,
+            'admin' => IsAdmin::class,
+            'guide' => IsGuide::class,
+            'guide.verified' => IsGuideVerified::class,
+            'voyageur' => IsVoyageur::class,
         ]);
     })
     ->withSchedule(function (Schedule $schedule): void {

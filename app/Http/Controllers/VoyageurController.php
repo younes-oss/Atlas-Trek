@@ -48,4 +48,21 @@ class VoyageurController extends Controller
         $user = Auth::user();
         return view('voyageur.profile', compact('user'));
     }
+
+    public function destroy(Reservation $reservation)
+    {
+        // Vérification de sécurité : seul le propriétaire peut supprimer
+        if ($reservation->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Seules les réservations annulées ou expirées devraient pouvoir être cachées de l'historique
+        if (!in_array($reservation->status, [Reservation::STATUS_CANCELLED, Reservation::STATUS_EXPIRED])) {
+            return redirect()->back()->with('error', 'Vous ne pouvez supprimer que les réservations annulées ou expirées.');
+        }
+
+        $reservation->delete();
+
+        return redirect()->back()->with('success', 'La réservation a été supprimée de votre historique.');
+    }
 }

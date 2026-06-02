@@ -65,6 +65,7 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['voyageur'])->prefix('voyageur')->group(function () {
         Route::get('/dashboard', [VoyageurController::class, 'dashboard'])->name('voyageur.dashboard');
         Route::get('/reservations', [VoyageurController::class, 'reservations'])->name('voyageur.reservations');
+        Route::delete('/reservations/{reservation}', [VoyageurController::class, 'destroy'])->name('voyageur.reservations.destroy');
         Route::get('/profile', [VoyageurController::class, 'profile'])->name('voyageur.profile');
     });
 
