@@ -150,8 +150,50 @@
                     @enderror
                 </div>
 
-                <!-- ═══ Dates de la visite ═══ -->
+                <!-- ═══ Détails du séjour ═══ -->
                 <div class="border-t border-gray-100 pt-6 mt-2">
+                    <h3 class="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
+                        <svg class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                        Détails du séjour
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Logement -->
+                        <div>
+                            <label for="logement" class="block text-sm font-bold text-gray-700 mb-2">Logement <span class="text-gray-400 font-normal">(optionnel)</span></label>
+                            <input type="text" id="logement" name="logement" value="{{ old('logement') }}"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none"
+                                placeholder="Ex: Bivouac, Gîte...">
+                            @error('logement')
+                                <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Transport -->
+                        <div>
+                            <label for="transport" class="block text-sm font-bold text-gray-700 mb-2">Transport <span class="text-gray-400 font-normal">(optionnel)</span></label>
+                            <input type="text" id="transport" name="transport" value="{{ old('transport') }}"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none"
+                                placeholder="Ex: Minibus, 4x4...">
+                            @error('transport')
+                                <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Repas -->
+                        <div>
+                            <label for="repas" class="block text-sm font-bold text-gray-700 mb-2">Repas <span class="text-gray-400 font-normal">(optionnel)</span></label>
+                            <input type="text" id="repas" name="repas" value="{{ old('repas') }}"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none"
+                                placeholder="Ex: Pension complète...">
+                            @error('repas')
+                                <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ═══ Dates de la visite ═══ -->
+                <div class="border-t border-gray-100 pt-6 mt-6">
                     <h3 class="text-sm font-bold text-gray-700 mb-4 flex items-center gap-2">
                         <svg class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                         Planification

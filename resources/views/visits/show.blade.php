@@ -165,6 +165,47 @@
                     </div>
                 </div>
 
+                <!-- Logistics Cards -->
+                @if($visit->logement || $visit->transport || $visit->repas)
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+                    @if($visit->logement)
+                    <div class="bg-emerald-50/50 p-6 rounded-3xl border border-emerald-100/50 flex items-center gap-4 hover:shadow-md hover:-translate-y-1 transition-all">
+                        <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-emerald-600 flex-shrink-0">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                        </div>
+                        <div>
+                            <p class="text-[10px] uppercase font-black text-emerald-600/60 tracking-widest">Logement</p>
+                            <p class="font-extrabold text-gray-900 leading-tight">{{ $visit->logement }}</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($visit->transport)
+                    <div class="bg-blue-50/50 p-6 rounded-3xl border border-blue-100/50 flex items-center gap-4 hover:shadow-md hover:-translate-y-1 transition-all">
+                        <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-blue-600 flex-shrink-0">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                        </div>
+                        <div>
+                            <p class="text-[10px] uppercase font-black text-blue-600/60 tracking-widest">Transport</p>
+                            <p class="font-extrabold text-gray-900 leading-tight">{{ $visit->transport }}</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($visit->repas)
+                    <div class="bg-amber-50/50 p-6 rounded-3xl border border-amber-100/50 flex items-center gap-4 hover:shadow-md hover:-translate-y-1 transition-all">
+                        <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-amber-600 flex-shrink-0">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z" /></svg>
+                        </div>
+                        <div>
+                            <p class="text-[10px] uppercase font-black text-amber-600/60 tracking-widest">Repas</p>
+                            <p class="font-extrabold text-gray-900 leading-tight">{{ $visit->repas }}</p>
+                        </div>
+                    </div>
+                    @endif
+                </div>
+                @endif
+
                 <!-- Description -->
                 <div class="mb-12">
                     <h2 class="text-3xl font-black text-gray-900 mb-8 tracking-tighter">À propos de cette visite</h2>

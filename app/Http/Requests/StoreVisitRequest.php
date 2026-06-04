@@ -32,6 +32,11 @@ class StoreVisitRequest extends FormRequest
             'date_depart'             => 'required|date|after:now',
             'date_fin'                => 'nullable|date|after:date_depart',
             'date_limite_reservation' => 'required|date|after:now|before:date_depart',
+
+            // Détails additionnels
+            'logement'                => 'nullable|string|max:255',
+            'transport'               => 'nullable|string|max:255',
+            'repas'                   => 'nullable|string|max:255',
         ];
     }
 

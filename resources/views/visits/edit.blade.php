@@ -201,6 +201,35 @@
             <input type="file" name="image">
         </div>
 
+        <!-- ═══ Détails du séjour ═══ -->
+        <div class="form-group" style="border-top: 1px solid #eee; padding-top: 18px; margin-top: 10px;">
+            <label style="color: #e67e22; font-size: 14px;">🏕️ Détails du séjour</label>
+        </div>
+
+        <div class="form-group">
+            <label for="logement">Logement <small>(optionnel)</small></label>
+            <input type="text" id="logement" name="logement" value="{{ old('logement', $visit->logement) }}" placeholder="Ex: Bivouac, Gîte...">
+            @error('logement')
+            <div class="error">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label for="transport">Transport <small>(optionnel)</small></label>
+            <input type="text" id="transport" name="transport" value="{{ old('transport', $visit->transport) }}" placeholder="Ex: Minibus, 4x4...">
+            @error('transport')
+            <div class="error">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="form-group">
+            <label for="repas">Repas <small>(optionnel)</small></label>
+            <input type="text" id="repas" name="repas" value="{{ old('repas', $visit->repas) }}" placeholder="Ex: Pension complète...">
+            @error('repas')
+            <div class="error">{{ $message }}</div>
+            @enderror
+        </div>
+
         <!-- ═══ Dates de la visite ═══ -->
         <div class="form-group" style="border-top: 1px solid #eee; padding-top: 18px; margin-top: 10px;">
             <label style="color: #e67e22; font-size: 14px;">📅 Planification</label>

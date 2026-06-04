@@ -105,6 +105,9 @@ class VisitController extends Controller
             'date_depart'             => $request->date_depart,
             'date_fin'                => $request->date_fin,
             'date_limite_reservation' => $request->date_limite_reservation,
+            'logement'                => $request->logement,
+            'transport'               => $request->transport,
+            'repas'                   => $request->repas,
         ]);
 
         return redirect()
@@ -145,6 +148,9 @@ class VisitController extends Controller
             'date_depart'             => $request->date_depart,
             'date_fin'                => $request->date_fin,
             'date_limite_reservation' => $request->date_limite_reservation,
+            'logement'                => $request->logement,
+            'transport'               => $request->transport,
+            'repas'                   => $request->repas,
         ];
 
         if ($request->hasFile('image')) {

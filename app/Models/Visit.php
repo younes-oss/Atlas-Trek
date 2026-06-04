@@ -20,6 +20,9 @@ class Visit extends Model
         'date_depart',
         'date_fin',
         'date_limite_reservation',
+        'logement',
+        'transport',
+        'repas',
     ];
 
     /**
