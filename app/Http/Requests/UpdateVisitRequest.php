@@ -28,8 +28,19 @@ class UpdateVisitRequest extends FormRequest
             'date_fin'                => 'nullable|date|after:date_depart',
             'date_limite_reservation' => 'required|date|after:now|before:date_depart',
             'logement'                => 'nullable|string|max:255',
+            'logement_desc'           => 'nullable|string',
+            'logement_img'            => 'nullable|image|mimes:jpeg,png,jpg|max:20480',
             'transport'               => 'nullable|string|max:255',
+            'transport_desc'          => 'nullable|string',
+            'transport_img'           => 'nullable|image|mimes:jpeg,png,jpg|max:20480',
             'repas'                   => 'nullable|string|max:255',
+            'repas_desc'              => 'nullable|string',
+            'repas_img'               => 'nullable|image|mimes:jpeg,png,jpg|max:20480',
+            'programme'               => 'nullable|array',
+            'programme.*.titre'       => 'required_with:programme|string|max:255',
+            'programme.*.description' => 'required_with:programme|string',
+            'gallery'                 => 'nullable|array|max:6',
+            'gallery.*'               => 'image|mimes:jpeg,png,jpg|max:20480',
         ];
     }
 

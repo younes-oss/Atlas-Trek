@@ -156,38 +156,80 @@
                         <svg class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                         Détails du séjour
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <!-- Logement -->
-                        <div>
-                            <label for="logement" class="block text-sm font-bold text-gray-700 mb-2">Logement <span class="text-gray-400 font-normal">(optionnel)</span></label>
-                            <input type="text" id="logement" name="logement" value="{{ old('logement') }}"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none"
-                                placeholder="Ex: Bivouac, Gîte...">
-                            @error('logement')
-                                <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
-                            @enderror
+                        <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 space-y-4">
+                            <h4 class="font-black text-emerald-600 uppercase tracking-widest text-xs flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                                Logement
+                            </h4>
+                            <div>
+                                <label for="logement" class="block text-xs font-bold text-gray-700 mb-1">Type (ex: Gîte, Bivouac...)</label>
+                                <input type="text" id="logement" name="logement" value="{{ old('logement') }}"
+                                    class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm">
+                                @error('logement') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label for="logement_desc" class="block text-xs font-bold text-gray-700 mb-1">Description</label>
+                                <textarea id="logement_desc" name="logement_desc" rows="2"
+                                    class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-emerald-500 outline-none text-sm">{{ old('logement_desc') }}</textarea>
+                                @error('logement_desc') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label for="logement_img" class="block text-xs font-bold text-gray-700 mb-1">Image illustrative</label>
+                                <input type="file" id="logement_img" name="logement_img" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                                @error('logement_img') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                            </div>
                         </div>
 
                         <!-- Transport -->
-                        <div>
-                            <label for="transport" class="block text-sm font-bold text-gray-700 mb-2">Transport <span class="text-gray-400 font-normal">(optionnel)</span></label>
-                            <input type="text" id="transport" name="transport" value="{{ old('transport') }}"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none"
-                                placeholder="Ex: Minibus, 4x4...">
-                            @error('transport')
-                                <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
-                            @enderror
+                        <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 space-y-4">
+                            <h4 class="font-black text-blue-600 uppercase tracking-widest text-xs flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                                Transport
+                            </h4>
+                            <div>
+                                <label for="transport" class="block text-xs font-bold text-gray-700 mb-1">Moyen (ex: 4x4, Minibus...)</label>
+                                <input type="text" id="transport" name="transport" value="{{ old('transport') }}"
+                                    class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                                @error('transport') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label for="transport_desc" class="block text-xs font-bold text-gray-700 mb-1">Description</label>
+                                <textarea id="transport_desc" name="transport_desc" rows="2"
+                                    class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm">{{ old('transport_desc') }}</textarea>
+                                @error('transport_desc') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label for="transport_img" class="block text-xs font-bold text-gray-700 mb-1">Image illustrative</label>
+                                <input type="file" id="transport_img" name="transport_img" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                                @error('transport_img') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                            </div>
                         </div>
 
                         <!-- Repas -->
-                        <div>
-                            <label for="repas" class="block text-sm font-bold text-gray-700 mb-2">Repas <span class="text-gray-400 font-normal">(optionnel)</span></label>
-                            <input type="text" id="repas" name="repas" value="{{ old('repas') }}"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all outline-none"
-                                placeholder="Ex: Pension complète...">
-                            @error('repas')
-                                <p class="text-red-500 text-xs mt-1 font-medium">{{ $message }}</p>
-                            @enderror
+                        <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 space-y-4">
+                            <h4 class="font-black text-amber-600 uppercase tracking-widest text-xs flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-2v2m3-2v2M9 3h.01M12 3h.01M15 3h.01M21 21v-7a2 2 0 00-2-2H5a2 2 0 00-2 2v7h18zm-3-9v-2a2 2 0 00-2-2H8a2 2 0 00-2 2v2h12z" /></svg>
+                                Repas
+                            </h4>
+                            <div>
+                                <label for="repas" class="block text-xs font-bold text-gray-700 mb-1">Type (ex: Pension complète...)</label>
+                                <input type="text" id="repas" name="repas" value="{{ old('repas') }}"
+                                    class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-500 outline-none text-sm">
+                                @error('repas') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label for="repas_desc" class="block text-xs font-bold text-gray-700 mb-1">Description</label>
+                                <textarea id="repas_desc" name="repas_desc" rows="2"
+                                    class="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-amber-500 outline-none text-sm">{{ old('repas_desc') }}</textarea>
+                                @error('repas_desc') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            <div>
+                                <label for="repas_img" class="block text-xs font-bold text-gray-700 mb-1">Image illustrative</label>
+                                <input type="file" id="repas_img" name="repas_img" class="w-full text-xs text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+                                @error('repas_img') <p class="text-red-500 text-[10px] mt-1">{{ $message }}</p> @enderror
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -35,8 +35,23 @@ class StoreVisitRequest extends FormRequest
 
             // Détails additionnels
             'logement'                => 'nullable|string|max:255',
+            'logement_desc'           => 'nullable|string',
+            'logement_img'            => 'nullable|image|mimes:jpeg,png,jpg|max:20480',
             'transport'               => 'nullable|string|max:255',
+            'transport_desc'          => 'nullable|string',
+            'transport_img'           => 'nullable|image|mimes:jpeg,png,jpg|max:20480',
             'repas'                   => 'nullable|string|max:255',
+            'repas_desc'              => 'nullable|string',
+            'repas_img'               => 'nullable|image|mimes:jpeg,png,jpg|max:20480',
+
+            // Programme jour par jour (JSON)
+            'programme'               => 'nullable|array',
+            'programme.*.titre'       => 'required_with:programme|string|max:255',
+            'programme.*.description' => 'required_with:programme|string',
+
+            // Galerie d'images
+            'gallery'                 => 'nullable|array|max:6',
+            'gallery.*'               => 'image|mimes:jpeg,png,jpg|max:20480',
         ];
     }
 

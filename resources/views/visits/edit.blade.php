@@ -206,28 +206,64 @@
             <label style="color: #e67e22; font-size: 14px;">🏕️ Détails du séjour</label>
         </div>
 
-        <div class="form-group">
-            <label for="logement">Logement <small>(optionnel)</small></label>
-            <input type="text" id="logement" name="logement" value="{{ old('logement', $visit->logement) }}" placeholder="Ex: Bivouac, Gîte...">
-            @error('logement')
-            <div class="error">{{ $message }}</div>
-            @enderror
+        <!-- Logement -->
+        <div class="form-group" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+            <label style="color: #27ae60; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px;">🏡 Logement</label>
+            <div style="margin-bottom: 10px;">
+                <label for="logement" style="font-size: 13px;">Type (ex: Bivouac)</label>
+                <input type="text" id="logement" name="logement" value="{{ old('logement', $visit->logement) }}">
+                @error('logement') <div class="error">{{ $message }}</div> @enderror
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="logement_desc" style="font-size: 13px;">Description détaillée</label>
+                <textarea id="logement_desc" name="logement_desc" style="height: 70px;">{{ old('logement_desc', $visit->logement_desc) }}</textarea>
+                @error('logement_desc') <div class="error">{{ $message }}</div> @enderror
+            </div>
+            <div>
+                <label for="logement_img" style="font-size: 13px;">Nouvelle image (optionnel)</label>
+                <input type="file" id="logement_img" name="logement_img">
+                @error('logement_img') <div class="error">{{ $message }}</div> @enderror
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="transport">Transport <small>(optionnel)</small></label>
-            <input type="text" id="transport" name="transport" value="{{ old('transport', $visit->transport) }}" placeholder="Ex: Minibus, 4x4...">
-            @error('transport')
-            <div class="error">{{ $message }}</div>
-            @enderror
+        <!-- Transport -->
+        <div class="form-group" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+            <label style="color: #2980b9; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px;">🚙 Transport</label>
+            <div style="margin-bottom: 10px;">
+                <label for="transport" style="font-size: 13px;">Type (ex: Minibus)</label>
+                <input type="text" id="transport" name="transport" value="{{ old('transport', $visit->transport) }}">
+                @error('transport') <div class="error">{{ $message }}</div> @enderror
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="transport_desc" style="font-size: 13px;">Description détaillée</label>
+                <textarea id="transport_desc" name="transport_desc" style="height: 70px;">{{ old('transport_desc', $visit->transport_desc) }}</textarea>
+                @error('transport_desc') <div class="error">{{ $message }}</div> @enderror
+            </div>
+            <div>
+                <label for="transport_img" style="font-size: 13px;">Nouvelle image (optionnel)</label>
+                <input type="file" id="transport_img" name="transport_img">
+                @error('transport_img') <div class="error">{{ $message }}</div> @enderror
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="repas">Repas <small>(optionnel)</small></label>
-            <input type="text" id="repas" name="repas" value="{{ old('repas', $visit->repas) }}" placeholder="Ex: Pension complète...">
-            @error('repas')
-            <div class="error">{{ $message }}</div>
-            @enderror
+        <!-- Repas -->
+        <div class="form-group" style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+            <label style="color: #f39c12; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px;">🍽️ Repas</label>
+            <div style="margin-bottom: 10px;">
+                <label for="repas" style="font-size: 13px;">Type (ex: Pension complète)</label>
+                <input type="text" id="repas" name="repas" value="{{ old('repas', $visit->repas) }}">
+                @error('repas') <div class="error">{{ $message }}</div> @enderror
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="repas_desc" style="font-size: 13px;">Description détaillée</label>
+                <textarea id="repas_desc" name="repas_desc" style="height: 70px;">{{ old('repas_desc', $visit->repas_desc) }}</textarea>
+                @error('repas_desc') <div class="error">{{ $message }}</div> @enderror
+            </div>
+            <div>
+                <label for="repas_img" style="font-size: 13px;">Nouvelle image (optionnel)</label>
+                <input type="file" id="repas_img" name="repas_img">
+                @error('repas_img') <div class="error">{{ $message }}</div> @enderror
+            </div>
         </div>
 
         <!-- ═══ Dates de la visite ═══ -->
