@@ -128,7 +128,7 @@ class ReservationController extends Controller
         // ══ Branche CONFIRMATION ══
         if ($newStatus === Reservation::STATUS_CONFIRMED) {
             try {
-                DB::transaction(function () use ($reservation) {
+                $result = DB::transaction(function () use ($reservation) {
 
                     // ── Verrouillage pessimiste : visit + reservation
                     $visit           = Visit::lockForUpdate()->findOrFail($reservation->visit_id);
@@ -136,10 +136,12 @@ class ReservationController extends Controller
 
                     // ── Règle 1 : La visite a-t-elle déjà démarré ?
                     if ($visit->hasStarted()) {
-                        throw new \Exception(
-                            'Impossible de confirmer : la date de départ de cette visite est déjà passée ('
-                            . $visit->date_depart->format('d/m/Y H:i') . ').'
-                        );
+                        $reservationLock->update(['status' => Reservation::STATUS_EXPIRED]);
+                        return [
+                            'error' => 'Impossible de confirmer : la date de départ de cette visite est déjà passée (' 
+                                       . $visit->date_depart->format('d/m/Y H:i') 
+                                       . '). La réservation a été automatiquement marquée comme expirée.'
+                        ];
                     }
 
                     // ── Règle 2 : Statut encore en attente ?
@@ -167,7 +169,12 @@ class ReservationController extends Controller
 
                     // ── Tout est OK → on confirme
                     $reservationLock->update(['status' => Reservation::STATUS_CONFIRMED]);
+                    return true;
                 });
+
+                if (is_array($result) && isset($result['error'])) {
+                    return redirect()->back()->withErrors(['error' => $result['error']]);
+                }
 
                 return redirect()->back()->with('success', 'Réservation confirmée avec succès.');
 

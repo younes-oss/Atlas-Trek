@@ -21,8 +21,16 @@ class Visit extends Model
         'date_fin',
         'date_limite_reservation',
         'logement',
+        'logement_desc',
+        'logement_img',
         'transport',
+        'transport_desc',
+        'transport_img',
         'repas',
+        'repas_desc',
+        'repas_img',
+        'programme',
+        'gallery',
     ];
 
     /**
@@ -33,6 +41,8 @@ class Visit extends Model
         'date_depart'              => 'datetime',
         'date_fin'                 => 'datetime',
         'date_limite_reservation'  => 'datetime',
+        'programme'                => 'array',
+        'gallery'                  => 'array',
     ];
 
     public function user()

@@ -87,28 +87,42 @@ class VisitController extends Controller
      */
     public function store(StoreVisitRequest $request)
     {
-        $path = null;
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('visits', 'public');
-        }
-
-        Visit::create([
+        $data = [
             'title'                   => $request->title,
             'description'             => $request->description,
             'location'                => $request->location,
             'price'                   => $request->price,
             'duration'                => $request->duration,
             'difficulty'              => $request->difficulty,
-            'image'                   => $path,
             'user_id'                 => auth()->id(),
             'max_places'              => $request->max_places,
             'date_depart'             => $request->date_depart,
             'date_fin'                => $request->date_fin,
             'date_limite_reservation' => $request->date_limite_reservation,
             'logement'                => $request->logement,
+            'logement_desc'           => $request->logement_desc,
             'transport'               => $request->transport,
+            'transport_desc'          => $request->transport_desc,
             'repas'                   => $request->repas,
-        ]);
+            'repas_desc'              => $request->repas_desc,
+            'programme'               => $request->programme,
+            'gallery'                 => $this->uploadGallery($request),
+        ];
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('visits', 'public');
+        }
+        if ($request->hasFile('logement_img')) {
+            $data['logement_img'] = $request->file('logement_img')->store('visits/logistics', 'public');
+        }
+        if ($request->hasFile('transport_img')) {
+            $data['transport_img'] = $request->file('transport_img')->store('visits/logistics', 'public');
+        }
+        if ($request->hasFile('repas_img')) {
+            $data['repas_img'] = $request->file('repas_img')->store('visits/logistics', 'public');
+        }
+
+        Visit::create($data);
 
         return redirect()
             ->route('guide.dashboard')
@@ -149,13 +163,35 @@ class VisitController extends Controller
             'date_fin'                => $request->date_fin,
             'date_limite_reservation' => $request->date_limite_reservation,
             'logement'                => $request->logement,
+            'logement_desc'           => $request->logement_desc,
             'transport'               => $request->transport,
+            'transport_desc'          => $request->transport_desc,
             'repas'                   => $request->repas,
+            'repas_desc'              => $request->repas_desc,
+            'programme'               => $request->programme,
         ];
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('visits', 'public');
         }
+        if ($request->hasFile('logement_img')) {
+            $data['logement_img'] = $request->file('logement_img')->store('visits/logistics', 'public');
+        }
+        if ($request->hasFile('transport_img')) {
+            $data['transport_img'] = $request->file('transport_img')->store('visits/logistics', 'public');
+        }
+        if ($request->hasFile('repas_img')) {
+            $data['repas_img'] = $request->file('repas_img')->store('visits/logistics', 'public');
+        }
+
+        // Galerie : fusionner les nouvelles images avec les existantes
+        $gallery = $visit->gallery ?? [];
+        if ($request->hasFile('gallery')) {
+            foreach ($request->file('gallery') as $img) {
+                $gallery[] = $img->store('visits/gallery', 'public');
+            }
+        }
+        $data['gallery'] = $gallery;
 
         $visit->update($data);
 
@@ -178,5 +214,21 @@ class VisitController extends Controller
         return redirect()
             ->route('guide.dashboard')
             ->with('success', 'Visite supprimée avec succès !');
+    }
+
+    /**
+     * Upload les images de la galerie et retourne un tableau de chemins.
+     */
+    private function uploadGallery($request): ?array
+    {
+        if (!$request->hasFile('gallery')) {
+            return null;
+        }
+
+        $paths = [];
+        foreach ($request->file('gallery') as $img) {
+            $paths[] = $img->store('visits/gallery', 'public');
+        }
+        return $paths;
     }
 }
